@@ -502,7 +502,7 @@ void menu_playlists(Map* archivo_c, Map* mapa_PL, Queue* cola_repro){
 }
 
 // 5 MI COLA DE REPRODUCCION
-void iniciar_cola(Map * canciones, Queue * cola_repro){
+void iniciar_cola(Map * canciones, Queue * cola_repro, Map *artistas){
     if(queue_front(cola_repro) != NULL) queue_clean(cola_repro); 
     char song_user[150];
     int encontrado = 0;
@@ -512,7 +512,9 @@ void iniciar_cola(Map * canciones, Queue * cola_repro){
 
         MapPair * song_pair = map_search(canciones, song_user);
         if(song_pair != NULL){
-            queue_insert(cola_repro, song_pair -> value);
+            CANCION *cancion_insertada = (CANCION *)song_pair->value;
+            queue_insert(cola_repro, cancion_insertada);
+            actualizar_frecuencia_art(artistas, cancion_insertada->artista);
             encontrado = 1;
             return;
         }
@@ -522,14 +524,14 @@ void iniciar_cola(Map * canciones, Queue * cola_repro){
     } while(encontrado != 1);
 }
 
-void anadir_cancion(Map * canciones, Queue * cola_repro){
+void anadir_cancion(Map * canciones, Queue * cola_repro, Map *artistas){
 
     if(queue_front(cola_repro) == NULL){
         char opcion;
         printf("No existe ninguna cola activa!\n");
         printf("Desea iniciar una? (s/n)\n");
         scanf(" %c", &opcion);
-        if(opcion == 's') iniciar_cola(canciones, cola_repro);
+        if(opcion == 's') iniciar_cola(canciones, cola_repro, artistas);
         return;
     }
 
@@ -541,7 +543,9 @@ void anadir_cancion(Map * canciones, Queue * cola_repro){
 
         MapPair * song_pair = map_search(canciones, song_user);
         if(song_pair != NULL){
-            queue_insert(cola_repro, song_pair -> value);
+            CANCION *cancion_insertada = (CANCION *)song_pair->value;
+            queue_insert(cola_repro, cancion_insertada);
+            actualizar_frecuencia_art(artistas, cancion_insertada->artista);
             encontrado = 1;
             return;
         }
@@ -654,6 +658,100 @@ void menu_cola(Map * canciones, Queue * cola_repro){
     } while(opcion != '7');
 }
 
+// 6 TOP 3 ARTISTAS
+
+void cargar_artistas(Map *artistas){
+    FILE *archivo = fopen("artistas.bin", "rb");
+    if (archivo == NULL)
+    {
+        FILE *archivo = fopen("artistas.bin", "wb");
+        fclose(archivo);
+        return;
+    }
+
+    ARTISTA art_leido;
+    while(fread(&art_leido, sizeof(ARTISTA), 1, archivo) == 1)
+        {
+            ARTISTA *art = (ARTISTA*)malloc(sizeof(ARTISTA));
+            strcpy(art->nombre, art_leido.nombre);
+            art->frecuencia = art_leido.frecuencia;
+            map_insert(artistas, art->nombre, art);
+        }
+    fclose(archivo);
+}
+
+void guardar_artistas(Map *artistas){
+    FILE *archivo = fopen("artistas.bin", "wb");
+    if (archivo == NULL) return;
+
+    MapPair *par_art = map_first(artistas);
+    while (par_art != NULL)
+        {
+            ARTISTA *art = (ARTISTA*)par_art->value;
+            fwrite(art, sizeof(ARTISTA), 1, archivo);
+            par_art = map_next(artistas);
+        }
+    fclose(archivo);
+}
+
+void actualizar_frecuencia_art(Map *artistas, char *nombre_artista){
+    //se busca si el artista ya está registrado en el mapa
+    MapPair *par_artista = map_search(artistas, nombre_artista);
+
+    //en caso de ya estar dentro del mapa, se aumenta su frecuencia en uno
+    if (par_artista != NULL)
+    {
+        ARTISTA *artista = par_artista->value;
+        artista->frecuencia = artista->frecuencia+1;
+    }
+
+    //y sino, es la primera vez que se escucha, por lo que se agrega al mapa con su frecuencia en 1
+    else
+    {
+        ARTISTA *artista_nuevo = (ARTISTA*)malloc(sizeof(ARTISTA));
+        strcpy(artista_nuevo->nombre, nombre_artista);
+        artista_nuevo->frecuencia = 1;
+        map_insert(artistas, artista_nuevo->nombre, artista_nuevo);
+    }
+}
+
+void mostrar_top3(Map *artistas){
+    //en caso de que el mapa de artistas esté vacío se manda el mensaje de error
+    if (map_first(artistas) == NULL)
+    {
+        printf("No ha sido posible mostrar el top 3 de artistas.\n");
+        return;
+    }
+
+    //se crea el Heap vacío para poder ordenar el mapa de artistas por su frecuencia
+    Heap *top_artistas = heap_create();
+
+    //se recorre todo el mapa y se ingresan al Heap usando la frecuencia como prioridad
+    MapPair *par_artista = map_first(artistas);
+    while (par_artista != NULL)
+        {
+            ARTISTA *artista = (ARTISTA*)par_artista->value;
+            heap_push(top_artistas, artista, artista->frecuencia);
+            par_artista = map_next(artistas);
+        }
+
+    printf("\n==================================\n");
+    printf("TOP 3 ARTISTAS MÁS ESCUCHADOS\n");
+    printf("==================================\n");
+
+    
+    int top = 1;
+    while (top <= 3 && heap_top(top_artistas) != NULL)
+        {
+            //se obtiene el mejor artista del Heap que sería el de mayor frecuencia
+            ARTISTA *mejor_art = (ARTISTA *)heap_top(top_artistas); //casting para evitar errores de memoria
+            printf("%d) %s (%d veces)\n", top, mejor_art->nombre, mejor_art->frecuencia);
+            //se elimina al primer artista para asi poder obtener el 2° y 3° artista con más escucha
+            heap_pop(top_artistas);
+            top++;
+        }
+}
+
 // MAIN
 int main()
 {
@@ -665,7 +763,9 @@ int main()
     Map * canciones_g = map_create(is_equal_str);
     CANCION * cancion_fav = leer_cancion_fav();
     Queue * cola_repro = queue_create(cola_repro);
+    Map *mapa_artistas = map_create(is_equal_str);
     cargar_canciones(canciones, canciones_g);
+    cargar_artistas(mapa_artistas);
     printf("Archivo Cargado!\n");
     presioneTeclaParaContinuar();
 
@@ -690,6 +790,7 @@ int main()
             menu_cola(canciones, cola_repro);
             break;
         case '6':
+            guardar_artistas(mapa_artistas);
             puts("Saliendo del programa.....");
             break;
         default:
