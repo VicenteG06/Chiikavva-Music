@@ -11,7 +11,7 @@ typedef struct {
 
 typedef struct Map Map;
 
-Map *map_create(int (*is_equal)(void *key1, void *key2)); // unsorted map
+Map *map_create(int (*is_equal)(void *key1, void *key2)); 
 
 Map *sorted_map_create(int (*lower_than)(void *key1, void *key2));
 

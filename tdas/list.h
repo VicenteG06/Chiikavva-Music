@@ -31,9 +31,13 @@ void *list_popBack(List *L);
 // Esta función elimina el elemento actual de la lista.
 void *list_popCurrent(List *L);
 
+void list_sortedInsert(List *L, void*data, int (*lower_than)(void *data1,void *data2));
+
 // Esta función elimina todos los elementos de la lista.
 void list_clean(List *L);
 
 int list_size(List* L);
+
+
 
 #endif

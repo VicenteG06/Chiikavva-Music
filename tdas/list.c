@@ -161,6 +161,32 @@ void *list_popCurrent(List *L) {
   return data;
 }
 
+void list_sortedInsert(List *L, void *data,
+                       int (*lower_than)(void *data1, void *data2)) {
+  if (L == NULL) {
+    return; // Lista no inicializada
+  }
+
+  // Caso especial: inserción al principio o en lista vacía
+  if (L->head == NULL || lower_than(data, L->head->data)) {
+    list_pushFront(L, data);
+    return;
+  }
+
+  // Caso general: encontrar la posición correcta para insertar
+  Node *current = L->head;
+  while (current->next != NULL && !lower_than(data, current->next->data)) {
+    current = current->next;
+  }
+
+  // Preparar para usar list_pushCurrent
+  L->current = current;
+
+  // Insertar el nodo en la posición actual
+  list_pushCurrent(L, data);
+}
+
+
 void list_clean(List *L) {
   if (L == NULL) {
     return; // Lista no inicializada
