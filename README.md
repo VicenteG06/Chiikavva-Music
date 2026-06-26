@@ -1,8 +1,8 @@
-# Base de Datos de Películas (StreamFinder)
+# 𐙚₊Ｃｈｉｉｋａｗａ⋆Ｍｕｓｉｃ˚⊹♡
 
 ## Descripción 
 
-Esta herramienta permite gestionar y explorar un catálogo masivo de películas y series de manera eficiente. La aplicación permitirá cargar datos externos, realizar búsquedas complejas, calificaciones por usuario y gestionar una lista de favoritos personalizada.
+Nuestro proyecto CHIIKAWA MUSIC permite organizar música en Playlists y colas de reproducción, ver tu Top de Artistas Más Escuchados, y expandir tu gusto musical con un Algoritmo de Recomendación, con un menú personalizado que incluye tu canción favorita y la canción que estes escuchando.
 
 ## Cómo compilar y ejecutar 
 
@@ -31,119 +31,176 @@ Este sistema ha sido desarrollado en lenguaje C y puede ejecutarse fácilmente a
 ## Funcionalidades
 
 ### Funcionando correctamente:
--  Cargar toda la información (catálogo de contenido) en memoria para su uso inmediato (desde un archivo CSV ingresado por la usuaria).
--  Búsqueda por id, director, género, década y de doble criterio, siendo estas las dos últimas mencionadas.
--  Gestión de "Watchlist" (ver más tarde/por ver), en la que se puede: agregar, retirar una película y mostrar las ingresadas al Watchlist.
--  Calificación por usuario.
+-  Cargar toda la información (catálogo de canciones) en memoria para su uso inmediato.
+  
+-  Crear una Playlist.
+-  Crear Playlist a partir de Cola de Reproducción
+-  Agregar o eliminar canciones a la Playlist.
+-  Mostrar Playlist.
+-  Algoritmo de Recomendación.
+-  Eliminar Playlist.
+
+-  Iniciar una Cola de Reproducción.
+-  Agregar o eliminar canciones a la Cola de Reproducción.
+-  Avanzar a la Siguiente Canción.
+-  Mostrar Cola de Reproducción.
+-  Mostrar Canción sonando por pantalla en el Menú Principal.
+-  Eliminar Cola de Reproducción.
+
+-  Agregar canción favorita.
+
+-  Top 3 Artistas.
+
+-  Guardado de Playlists, Top de Artistas y Canción favorita en archivos.
 
 ### Problemas conocidos: 
-- La usuaria *DEBE* cargar primero las películas (opción 1) para que la aplicación funcione.
 - No existe una validación de entrada (input) al momento de ingresar texto, por lo que se deben ingresar como máximo la cantidad de caracteres que se pide. Y si es que se piden números o letras se *DEBE* ingresar el tipo correspondiente.
-- Los nombres de los géneros, id y directores son únicos por lo que al querer ingresar, retirar o buscar cualquiera de esos datos, este debe ser escrito tal como se registró en el archivo, de lo contrario el sistema no los reconoce (“HOLA” no es lo mismo que “hola”).
+- Los nombres de las canciones y playlists son únicos, por lo que al querer agregar o eliminar alguna de estas, el nombre debe ser escrito tal como se registró en el archivo, de lo contrario el sistema no lo reconocerá (“HOLA” no es lo mismo que “hola”).
 - Cuando aparece el mensaje "*Presione una tecla para continuar...*", la única opción válida que permite continuar es *Enter*.
+- Si se ingresan espacios al nombrar Playlist o agregar Canciones, solo se tomarán los caracteres antes del espacio, y los que estén después del espacio se tomarán como nuevos registros de la usuaria, por lo que si se ingresa una cadena, un espacio, y un numero, el número se tomará como que el usuario seleccionó la opción correspondiente a ese número.
 
 ### A mejorar:
-- Implementar una validación de entrada que limite el largo del texto y que valide si es que el tipo de dato ingresado (número, texto) corresponde al solicitado. 
+- Implementar una validación de entrada que limite el largo del texto y que valide si es que el tipo de dato ingresado (número, texto) corresponde al solicitado.
+- Implementar una función que permita normalizar el texto al hacer la búsqueda para que las entradas no sean sensibles a mayúsculas.
 
 ## Ejemplo de uso 
 
-### Paso 1: Cargar Películas
-Este paso es *necesario* para que las otras opciones funcionen.
+### Paso 1: Crear Cola de Reproducción
+Se desea crear una cola de reproducción.  
 ````
-Opción seleccionada: 1) Cargar Películas
+Opción seleccionada: 5) Mi Cola de Reproducción 
 ````
-El sistema carga el catálogo de películas para su uso inmediato y se muestran TODAS las películas del archivo junto con su información completa.
+Se muestra el menú de Mi Cola de Reproducción.
+````
+Opción seleccionada: 1) Iniciar Cola de Reproducción
+Ingrese una canción a la cola : Closer
+````
+Esta canción ahora se mostrará como "Sonando" en el menú principal.
 
-### Paso 2: Buscar por década
-Se quiere buscar todas las películas que hayan sido estrenadas en cierta década.
+### Paso 2: Mi Cola de Reproducción -> Añadir canciones a la Cola de Reproducción
+Desde el menú de 5) Mi Cola de Reproducción.
 ````
-Opción seleccionada: 5) Buscar por Década
-Ingrese la decada de la película: 1942
+Opción seleccionada: 2) Añadir Canción a la Cola
+Ingrese una canción a la cola : Something Just Like This
 ````
-Se muestran TODAS las películas del archivo que hayan sido estrenadas desde 1940 a 1949 y su información completa.
+````
+Opción seleccionada: 2) Añadir Canción a la Cola
+Ingrese una canción a la cola : Roses
+````
+````
+Opción seleccionada: 2) Añadir Canción a la Cola
+Ingrese una canción a la cola : Problem
+````
+````
+Opción seleccionada: 2) Añadir Canción a la Cola
+Ingrese una canción a la cola : Grenade
+````
+Estas canciones se añaden a la Cola de Reproducción.
 
-### Paso 3: Buscar por id
-Se quiere buscar una película específica por su id.
+### Paso 3: Mi Cola de Reproducción -> Mostrar Cola de Reproducción
+Desde el menú de 5) Mi Cola de Reproducción.
 ````
-Opción seleccionada: 2) Buscar por id
-Ingrese el id de la película: tt0040982
+Opción seleccionada: 4) Mostrar Cola de Reproducción.
 ````
-Se muestra el ID, título, año, rating en IMDb, sus géneros, directores y reseñas ingresadas por usuario (reviews).
+Se mostrará el Título, Artista, Genero, Año y Duración de cada una de las canciones añadidas.
 
-### Paso 4: Buscar por género
-Se quiere buscar todas las películas que pertenecen a cierto género.
+### Paso 4: Mi Cola de Reproducción -> Eliminar Cancion de la Cola de Reproducción
+Desde el menú de 5) Mi Cola de Reproducción.
 ````
-Opción seleccionada: 3) Buscar por Género
-Ingrese el género de la película: Drama
+Opción seleccionada: 3) Eliminar Canción de Cola
+Ingrese el nombre de la canción a eliminar: Something Just Like This
 ````
-Se muestran TODAS las películas del archivo que pertenecen al género DRAMA y su información completa.
+Se eliminará la canción de la Cola de Reproducción.
 
-### Paso 5: Buscar por director
-Se quiere buscar todas las películas que hayan sido dirigidas por cierto/a director/a.
+### Paso 5: Mi Cola de Reproducción -> Avanzar a la Siguiente Canción
+Desde el menú de 5) Mi Cola de Reproducción.
 ````
-Opción seleccionada: 4) Buscar por Director
-Ingrese el/la director/a de la película: Tim Burton
+Opción seleccionada: 5) Siguiente Canción
 ````
-Se muestran TODAS las películas del archivo que hayan sido dirigidas por Tim Burton y su información completa.
+Ahora en el Menú Principal se mostrará como "Sonando" la siguiente canción de la Cola de Reproducción.
 
-### Paso 6: Agregar reseña
-Se quiere agregar una reseña a cierta película
+### Paso 6: Crear una Playlist a partir de una Cola de Reproducción
+Para crear una playlist a partir de una Cola de reproducción, primero deberemos ir al menú de Mis Playlists
 ````
-Opción seleccionada: 8) Agregar Reseña
-Ingrese el ID de la Película: tt0040982
-Ingrese su usuario: Javiera
-Ingrese su calificación de la película (0 - 10): 8
+Opción seleccionada: 4) Mis Playlists
 ````
-Ahora la película de ID tt0040982 tiene una reseña de 8 a nombre de Javiera.
+Se abrirá el Menú Mis Playlists
+Desde el Menú Mis Playlists
+````
+Opción seleccionada: 1) Crear Playlist
+¿Desea crear una Playlist a partir de su Cola de Reproducción? (s/n): s
+Ingrese un Nombre para su Playlist (máx 30 caracteres): Chiikawa Music
+````
+Se habrá creado una Playlist conteniendo todas las canciones de la Cola de Reproducción, agregadas anteriormente.
 
-### Paso 7: Mi watchlist -> agregar película
-Se quiere agregar dos películas por su ID a la watchlist.
+### Paso 7: Mis Playlist -> Mostrar Playlist
+Desde el menú 4) Mis Playlist
 ````
-Opción seleccionada: 7) Mi Watchlist
-Opción seleccionada: 1) Agregar Película
-Ingrese la ID de la Película a Añadir: tt0040982
-````
-Ahora la película de ID tt0040982 se encuentra dentro del watchlist de la usuaria.
-````
-Opción seleccionada: 1) Agregar Película
-Ingrese la ID de la Película a Añadir: tt0018756
-````
-Ahora la película de ID tt0018756 se encuentra dentro del watchlist de la usuaria.
+Opción seleccionada: 4) Mostrar Playlist
+Playlists Guardadas: 
+Nombre Playlist: Chiikawa Music
+¿Qué Playlist desea Ver?: Chiikawa Music
 
-### Paso 8: Mi watchlist -> mostrar películas en watchlist
-Se quieren ver todas las películas guardadas en watchlist.
 ````
-Opción seleccionada: 3) Mostrar Watchlist
-````
-Se muestra TODA la información de las películas de ID tt0040982 y tt0018756.
+Se mostrarán por pantalla todas las canciones que fueron agregadas a la Playlist
 
-### Paso 9: Mi watchlist -> eliminar película
-Se quiere eliminar una película de watchlist.
+### Paso 8: Mis Playlist -> Mostrar Playlists -> Agregar Canciones Recomendadas
+Al mostrar una playlists, se mostrarán 3 canciones recomendadas en base al género mas frecuente de la Playlist, que no hayan sido ya agregadas a esta.
+Se le da a la usuaria la opción de añadir una de las 3 canciones recomendadas a la Playlist, la cual se puede elegir ingresando el número correspondiente a la canción que se desee agregar (1 / 2 / 3).
 ````
-Opción seleccionada: 2) Eliminar Película
-Ingrese la ID de la Película a Eliminar: tt0040982
+Deseas agregar alguna canción recomendada a tu Playlist? 
+2) Agregar la Opción
+Opción 2 se ha agregado con éxito a Chiikawa Music!
 ````
-Ahora dentro del watchlist sólo se encuentra la película de ID tt0018756.
+Se agregará la Canción Recomendada mostrada en la posición número 2.
 
-### Paso 10: Búsqueda avanzada (por género y década)
-Se quiere buscar las películas que pertenezcan a cierto género y sean de cierta década.
+### Paso 9: Mis Playlist -> Eliminar Canción de Playlist
+Desde el menú 4) Mis Playlist.
 ````
-Opción seleccionada: 6) Buscar por Género y Década
-Ingrese el género de la pelicula: Drama
-Ingrese la decada de la película: 1942
+Opción seleccionada: 3) Eliminar canción de Playlist
 ````
-Se muestran TODAS las películas que pertenezcan al género de Drama y hayan sido estrenados entre 1940 y 1949.
+Se mostrarán todas las Playlists creadas y la usuaria deberá ingresar el nombre de la Playlist que desee modificar
+````
+Playlists Guardadas: 
+Nombre Playlist: Chiikawa Music
+````
+````
+¿Qué Playlist desea Modificar?
+Chiikawa Music
+````
+Se mostrarán por pantalla todas las canciones guardadas en la Playlist escogida por la usuaria
+````
+¿Qué canción desea eliminar?: 
+Grenade
+¡Canción eliminada correctamente!
+````
+La canción se habrá eliminado de la Playlist
+### Paso 10: Ingresar canción favorita 
+Desde el 6) Volver al menú principal
+````
+Opción seleccionada: 3) Ingresar Canción Favorita
+Ingrese su canción favorita: A L I E N S
+````
+Ahora en el menú principal, se mostrará la canción favorita de la usuaria.
+### Paso 1: Top 3 Artistas
+Desde el menú principal
+````
+Opción seleccionada: 2) Artistas más esuchcados
+````
+Se mostrarán el top 3 de artistas más escuchados, junto con la frecuencia de cada uno.
 
 ## Contribuciones
 
 ### Vicente Gamboa
--  Documentación y comentarios en el código.
--  Implementación de funciones de carga de películas (y sus subfunciones relacionadas a la organización de los datos del archivo para su uso inmediato), buscar por década, búsqueda avanzada (género y década), agregar reseña por usuario.
--  Revisión y corrección final.
--  Auto-evaluación: 3 (Aporte excelente).
+-  Menú de Mi cola de reproducción.
+-  Implementación de funciones de guardado de datos.
 
 ### Alexia Gallardo
-- Documentación y comentarios en el código.
-- Diseño y redacción del README.
-- Implementación de funciones de watchlist (menú, agregar, eliminar, mostrar), mostrar información de película, búsqueda por género y por director.
-- Auto-evaluación: 3 (Aporte excelente).
+- Menú de Playlists y todas sus subfunciones.
+
+## Viviana Navarrete 
+- Top 3 Artistas más escuchados y todas sus subfunciones.
+
+## Antonia Avello
+- Implementación de algoritmo de recomendación.
+- Desarrollo de archivo README.
