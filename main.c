@@ -612,22 +612,91 @@ void mostrar_PL(Map* mapa_PL, Map* canciones_g){
         }
     }
 
-<<<<<<< HEAD
-=======
-    canciones_rec(playlist_mostrar, canciones_g);
-
-    //SE MUESTRAN SUS CANCIONES RECOMENDADAS. SI NO TIENE, PORQUE NO HAY CANCIONES GUARDADAS, SE DA UN AVISO 
->>>>>>> 071e76e048beb805dfc651b63217afc5fc12027b
     puts("Canciones Recomendadas: ");
 
     //SE MUESTRAN SUS CANCIONES RECOMENDADAS. SI NO TIENE, PORQUE NO HAY CANCIONES GUARDADAS, SE DA UN AVISO 
     canciones_rec(playlist_mostrar, canciones_g);
+    /*
     if (list_first(playlist_mostrar->canciones_recomendadas)==NULL) printf("No hay canciones Recomendadas en %s\n", playlist_mostrar->nombre_playlist);
     else {
         CANCION* aux2= list_first(playlist_mostrar->canciones_recomendadas);
         while (aux2!=NULL){
             mostrar_info_canciones(aux2);
             aux2= list_next(playlist_mostrar->canciones_recomendadas);
+        }
+    }
+    */
+    int num_rec = list_size(playlist_mostrar->canciones_recomendadas);
+
+    CANCION* reco_arr[3] = {NULL,NULL,NULL};
+    CANCION* rec= list_first(playlist_mostrar->canciones_recomendadas);
+
+    for(int i=0; (i<num_rec) && (i<3)&&(rec!= NULL) ; i++){ //!!!_----------------------
+        //if(rec!=NULL){
+        reco_arr[i] = rec;
+        rec= list_next(playlist_mostrar->canciones_recomendadas);
+        
+    }
+
+    for(int i = 0; i<3; i++){
+        if(reco_arr[i] != NULL){
+            printf("%d) ", i+1);
+            mostrar_info_canciones(reco_arr[i]);
+        }
+        else{
+            printf("%d) No quedan más canciones para recomendar! \n",i+1);
+        }
+    }
+    
+    if(num_rec>0){
+        printf("\nDeseas agregar alguna canción recomendada a tu Playlist?\n");
+        printf("1 / 2 / 3) : Agregar la opción\n");
+        printf("0) Volver al menú\n");
+        printf("Ingrese su opción: ");
+        char op_rec;
+        scanf(" %c", &op_rec);
+
+        switch(op_rec){
+            case '1':
+                if (reco_arr[0] != NULL){
+                    list_pushBack(playlist_mostrar->canciones, reco_arr[0]);
+                    act_generos(playlist_mostrar,reco_arr[0],1);
+                    printf("%s se ha agregado con éxito a %s! \n",reco_arr[0]->cancion,playlist_mostrar->nombre_playlist);
+                }
+                else{
+                    puts("No hay una canción recomendada en esta opción");
+                }
+                break;
+            case '2':
+                if (reco_arr[1] != NULL){
+                    list_pushBack(playlist_mostrar->canciones, reco_arr[1]);
+                    act_generos(playlist_mostrar,reco_arr[1],1);
+                    printf("%s se ha agregado con éxito a %s! \n",reco_arr[1]->cancion,playlist_mostrar->nombre_playlist);
+                }
+                else{
+                    puts("No hay una canción recomendada en esta opción");
+                }
+                break;
+            case '3':
+                if (reco_arr[2] != NULL){
+                    list_pushBack(playlist_mostrar->canciones, reco_arr[2]);
+                    act_generos(playlist_mostrar,reco_arr[2],1);
+                    printf("%s se ha agregado con éxito a %s! \n",reco_arr[2]->cancion,playlist_mostrar->nombre_playlist);
+                }
+                else{
+                    puts("No hay una canción recomendada en esta opción");
+                }
+                break;
+            case '0':
+                puts("Volviendo a menú...");
+                break;
+            
+            default:
+               puts("Opción no valida");
+
+
+
+            
         }
     }
 }
