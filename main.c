@@ -123,7 +123,7 @@ CANCION * leer_cancion_fav(){
 void mostrar_menu_principal(CANCION * cancion_fav, CANCION * song){
     limpiarPantalla();
     puts("========================================");
-    puts("     Chiikavva Playist!");
+    puts("     Chiikavva Playlist!");
     puts("========================================");
     puts("1) Ver Canciones Cargadas");
     puts("2) Artistas más escuchados");
@@ -621,30 +621,30 @@ void mostrar_PL(Map* mapa_PL, Map* canciones_g){
     //SE MUESTRAN SUS CANCIONES RECOMENDADAS. SI NO TIENE, PORQUE NO HAY CANCIONES GUARDADAS, SE DA UN AVISO 
     canciones_rec(playlist_mostrar, canciones_g);
     
+    // Se obtiene el tamaño de la lista de canciones recomendadas
     int num_rec = list_size(playlist_mostrar->canciones_recomendadas);
 
     CANCION* reco_arr[3] = {NULL,NULL,NULL};
-    CANCION* rec= list_first(playlist_mostrar->canciones_recomendadas);
+    CANCION* rec= list_first(playlist_mostrar->canciones_recomendadas); // Auxiliar para recorrer la lista de canciones recomendadas 
 
-    for(int i=0; (i<num_rec) && (i<3)&&(rec!= NULL) ; i++){ //!!!_----------------------
-        //if(rec!=NULL){
-        reco_arr[i] = rec;
-        rec= list_next(playlist_mostrar->canciones_recomendadas);
+    for(int i=0; (i<num_rec) && (i<3)&&(rec!= NULL) ; i++){ 
+        reco_arr[i] = rec; // se traspasa al arreglo de canciones recomendadas 
+        rec= list_next(playlist_mostrar->canciones_recomendadas); //avanzar en la lista de recomendadas 
         
     }
 
     for(int i = 0; i<3; i++){
-        if(reco_arr[i] != NULL){
-            printf("%d) ", i+1);
-            mostrar_info_canciones(reco_arr[i]);
+        if(reco_arr[i] != NULL){ // Si la canción en la posición i está disponible o existe 
+            printf("%d) ", i+1); // se imprime el número de la canción 
+            mostrar_info_canciones(reco_arr[i]); // y se imprime la canción 
         }
         else{
-            printf("%d) No quedan más canciones para recomendar! \n",i+1);
+            printf("%d) No quedan más canciones para recomendar! \n",i+1); // Si la canción de la posición i no existe, es porque no quedan más canciones para recomendar 
         }
     }
     
-    if(num_rec>0){
-        printf("\nDeseas agregar alguna canción recomendada a tu Playlist?\n");
+    if(num_rec>0){ // Si hay al menos una canción disponible recomendada 
+        printf("\nDeseas agregar alguna canción recomendada a tu Playlist?\n"); // se le pregunta a la usuaria si desea agregar alguna canción recomendada a la playlist 
         printf("1 / 2 / 3) : Agregar la opción\n");
         printf("0) Volver al menú\n");
         printf("Ingrese su opción: ");
@@ -652,46 +652,42 @@ void mostrar_PL(Map* mapa_PL, Map* canciones_g){
         scanf(" %c", &op_rec);
 
         switch(op_rec){
-            case '1':
+            case '1': // si se desea agregar la canción 1) 
                 if (reco_arr[0] != NULL){
                     list_pushBack(playlist_mostrar->canciones, reco_arr[0]);
                     act_generos(playlist_mostrar,reco_arr[0],1);
                     printf("%s se ha agregado con éxito a %s! \n",reco_arr[0]->cancion,playlist_mostrar->nombre_playlist);
                 }
-                else{
+                else{ // si la canción en la posición 1 no existe o no está disponible  
                     puts("No hay una canción recomendada en esta opción");
                 }
                 break;
-            case '2':
+            case '2':  // si se desea agregar la canción en la posición 2
                 if (reco_arr[1] != NULL){
                     list_pushBack(playlist_mostrar->canciones, reco_arr[1]);
                     act_generos(playlist_mostrar,reco_arr[1],1);
                     printf("%s se ha agregado con éxito a %s! \n",reco_arr[1]->cancion,playlist_mostrar->nombre_playlist);
                 }
                 else{
-                    puts("No hay una canción recomendada en esta opción");
+                    puts("No hay una canción recomendada en esta opción");  // si la canción en la posición 2 no existe o no está disponible  
                 }
                 break;
-            case '3':
+            case '3': // si se desea agregar la canción en la posición 3 
                 if (reco_arr[2] != NULL){
                     list_pushBack(playlist_mostrar->canciones, reco_arr[2]);
                     act_generos(playlist_mostrar,reco_arr[2],1);
                     printf("%s se ha agregado con éxito a %s! \n",reco_arr[2]->cancion,playlist_mostrar->nombre_playlist);
                 }
-                else{
+                else{ // si la canción en la posición 2 no existe o no está disponible
                     puts("No hay una canción recomendada en esta opción");
                 }
                 break;
             case '0':
-                puts("Volviendo a menú...");
+                puts("Volviendo a menú..."); // si la usuaria desea volver al menú Playlist 
                 break;
             
             default:
                puts("Opción no valida");
-
-
-
-            
         }
     }
 }
@@ -1095,19 +1091,26 @@ void limpieza_carpeta_playlist(){
 }
 
 void guardar_playlist(Map * mapa_PL){
+    // Se obtiene la primera playlist del mapa
     MapPair * pl_pair = map_first(mapa_PL);
+    // Se incializa el contador en 1 para crear el nombre de los archivo
     int contador = 1;
     while(pl_pair != NULL){
         char nombre_archivo[50];
         char nombre_pl[50];
         PLAYLIST * pl_aux = pl_pair -> value;
+        // Se construyen los nombres de los archivos
         sprintf(nombre_archivo, "playlist/playlist_%d.bin", contador);
         sprintf(nombre_pl, "playlist/nombre_playlist_%d.txt", contador);
+        // Se crea el archivo que contiene el nombre de la playlist
         FILE * archivo_nombre = fopen(nombre_pl, "w");
+        // Se guarda el nombre de la playlist en el archivo txt
         if(archivo_nombre != NULL){
             fprintf(archivo_nombre, "%s\n", pl_aux -> nombre_playlist);
             fclose(archivo_nombre);
         }
+
+        // Se crea el archivo en el que se guardaran las canciones de la playlist
         FILE * archivo = fopen(nombre_archivo, "wb");
         if(archivo != NULL){
             List * songs_pl = pl_aux -> canciones;
@@ -1116,7 +1119,9 @@ void guardar_playlist(Map * mapa_PL){
                 fwrite(song, sizeof(CANCION), 1, archivo);
                 song = list_next(songs_pl);
             }
+            // Se aumenta en 1 el contador para construir los nombres de los archivos
             contador ++;
+            // Se cierra el archivo que contiene las canciones de la playlist
             fclose(archivo);
         }
         pl_pair = map_next(mapa_PL);
