@@ -905,8 +905,11 @@ void menu_cola(Map * canciones, Queue * cola_repro, Map *artistas){
 
 // 6 TOP 3 ARTISTAS
 
+//esta función es para cargar los artistas guardados en sesiones anteriores
 void cargar_artistas(Map *artistas){
+    //se intenta abrir el archivo en modo lectura
     FILE *archivo = fopen("artistas.bin", "rb");
+    //si no hay archivo, se crea uno nuevo y se retorna
     if (archivo == NULL)
     {
         FILE *archivo = fopen("artistas.bin", "wb");
@@ -914,10 +917,13 @@ void cargar_artistas(Map *artistas){
         return;
     }
 
+    //si el archivo existe, se lee un registro cada artista
     ARTISTA art_leido;
     while(fread(&art_leido, sizeof(ARTISTA), 1, archivo) == 1)
         {
+            //se reserva memoria para cada artista y así podemos agregarlos al mapa con los datos leídos desde el archivo
             ARTISTA *art = (ARTISTA*)malloc(sizeof(ARTISTA));
+            //se copian los datos del artista leído desde el archivo al artista que se va a ingresar al mapa
             strcpy(art->nombre, art_leido.nombre);
             art->frecuencia = art_leido.frecuencia;
             map_insert(artistas, art->nombre, art);
@@ -925,13 +931,19 @@ void cargar_artistas(Map *artistas){
     fclose(archivo);
 }
 
+//esta función es para guardar todo el contenido actual del mapa artistas, sobreescribiendo el archivo
+//o creando uno nuevo en el caso de que no exista el archivo
 void guardar_artistas(Map *artistas){
+    //se abre el archivo en modo escritura
     FILE *archivo = fopen("artistas.bin", "wb");
+    //si no existe el archivo, no guardamos nada y se retorna
     if (archivo == NULL) return;
 
+    //se recorre el mapa de artistas
     MapPair *par_art = map_first(artistas);
     while (par_art != NULL)
         {
+            //por cada artista actual del mapa se reescriben sus datos en el archivo
             ARTISTA *art = (ARTISTA*)par_art->value;
             fwrite(art, sizeof(ARTISTA), 1, archivo);
             par_art = map_next(artistas);
