@@ -620,16 +620,7 @@ void mostrar_PL(Map* mapa_PL, Map* canciones_g){
 
     //SE MUESTRAN SUS CANCIONES RECOMENDADAS. SI NO TIENE, PORQUE NO HAY CANCIONES GUARDADAS, SE DA UN AVISO 
     canciones_rec(playlist_mostrar, canciones_g);
-    /*
-    if (list_first(playlist_mostrar->canciones_recomendadas)==NULL) printf("No hay canciones Recomendadas en %s\n", playlist_mostrar->nombre_playlist);
-    else {
-        CANCION* aux2= list_first(playlist_mostrar->canciones_recomendadas);
-        while (aux2!=NULL){
-            mostrar_info_canciones(aux2);
-            aux2= list_next(playlist_mostrar->canciones_recomendadas);
-        }
-    }
-    */
+    
     int num_rec = list_size(playlist_mostrar->canciones_recomendadas);
 
     CANCION* reco_arr[3] = {NULL,NULL,NULL};
@@ -837,7 +828,7 @@ void mostrar_top3(Map *artistas){
 void iniciar_cola(Map * canciones, Queue * cola_repro, Map *artistas){
     // Si ya había una cola activa, esta se vacía para iniciar una nueva
     if(queue_front(cola_repro) != NULL) queue_clean(cola_repro); 
-    char song_user[150];
+    char song_user[151];
     int encontrado = 0;
     int intentos = 0;
     do{
@@ -889,7 +880,7 @@ void anadir_cancion(Map * canciones, Queue * cola_repro, Map *artistas){
         return;
     }
 
-    char song_user[150];
+    char song_user[151];
     int encontrado = 0;
     int intentos = 0;
     do{
@@ -935,7 +926,7 @@ void eliminar_cancion(Queue * cola_repro){
         return;
     }
 
-    char song_user[150];
+    char song_user[151];
     // Se le pregunta a la usuaria que canción de su cola desea eliminar
     printf("Ingrese el nombre de la canción a eliminar: ");
     scanf(" %[^\n]", song_user);
@@ -1095,6 +1086,14 @@ void guardar_artistas(Map *artistas){
     fclose(archivo);
 }
 
+void limpieza_carpeta_playlist(){
+    #ifdef _WIN32
+        // En Windows, esto borra todos los archivos y subcarpetas sin preguntar
+        system("del /Q /S playlist\\*.* > NUL 2>&1");
+        system("for /d %i in (playlist\\*) do rd /s /q \"%i\" > NUL 2>&1");
+    #endif
+}
+
 void guardar_playlist(Map * mapa_PL){
     MapPair * pl_pair = map_first(mapa_PL);
     int contador = 1;
@@ -1164,6 +1163,7 @@ int main()
             break;
         case '6':
             guardar_artistas(mapa_artistas); // Se guardan en un archivo el top 3 artistas de la usuaria
+            limpieza_carpeta_playlist(); // Se limpia la carpeta de playlist
             guardar_playlist(mapa_PL); // Se guardan en un archivo las playlists creadas por la usuaria
             puts("Saliendo del programa.....");
             break;
