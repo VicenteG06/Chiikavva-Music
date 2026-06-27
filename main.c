@@ -8,15 +8,15 @@
 #include "tdas/heap.h"
 
 typedef struct {
-    char cancion[150];
-    char artista[100];
-    char genero[100];
+    char cancion[151];
+    char artista[101];
+    char genero[101];
     int anyo;
     int duracion;
 } CANCION;
 
 typedef struct {
-    char nombre[100];
+    char nombre[101];
     int frecuencia;
 } ARTISTA; 
 
@@ -282,11 +282,11 @@ void cancion_favorita(Map * canciones, CANCION ** cancion_fav){
 // 4 MIS PLAYLISTS
 
 // -case 1.2
-void crear_PL_cola(Map* mapa_PL, Queue* cola_rep){ //HAY UN PROBLEMA CON EL GUARDAR NOMBRES + NS SI AQUI SE VE LO DE LOS GENEROS 
+void crear_PL_cola(Map* mapa_PL, Queue* cola_rep){  
     //SE LE SOLICITA A LA USUARIA QUE ELIJA UN NOMBRE PARA SU PLAYLIST 
     puts("Ingrese un Nombre para su Playlist (máx 30 caracteres): ");
-    char nombre[30];
-    scanf(" %29[^\n]", nombre);
+    char nombre[31];
+    scanf(" %30[^\n]", nombre);
     //SE VERIFICA QUE NO HAYA UNA PLAYLIST CON ESE NOMBRE. SI HAY UNA, SE DA UN AVISO Y SE RETORNA AL MENU DE PLAYLISTS
     MapPair * par_PL = map_search(mapa_PL, nombre);
     if(par_PL != NULL){
@@ -296,42 +296,36 @@ void crear_PL_cola(Map* mapa_PL, Queue* cola_rep){ //HAY UN PROBLEMA CON EL GUAR
     //SI EL NOMBRE NO ESTÁ REGISTRADO, SE CREA UNA NUEVA PLAYLIST
     PLAYLIST* nueva_pl= (PLAYLIST*)malloc(sizeof(PLAYLIST));
     strcpy(nueva_pl->nombre_playlist, nombre);
-    
-    //SE CREA LA LISTA VACIA DE SUS CANCIONES
-    List* nueva_canciones= list_create();
-    //SE GUARDA LA NUEVA LISTA EN LA PLAYLIST 
+    //SE CREA LA LISTA VACIA DE SUS CANCIONES Y SE GUARDA LA NUEVA LISTA EN LA PLAYLIST
+    List* nueva_canciones= list_create(); 
     nueva_pl->canciones= nueva_canciones;
-
+    //SE CREA LISTA VACIA DE CANCIONES RECOMENDADAS Y SE GUARDA EN LA PLAYLIST
     List* nueva_recomedadas= list_create();
     nueva_pl->canciones_recomendadas= nueva_recomedadas;
-
+    //SE CREA UN MAPA VACIO DE LOS GENEROS Y SE GUARDA EN LA PLAYLIST
     Map* nueva_generos= map_create(is_equal_str); 
-    //actualizar_generos_p(nueva_pl->canciones, nueva_generos);
     nueva_pl->generos_p= nueva_generos;
-    
     //SE RECORRE LA COLA Y SE COPIA SUS CANCIONES EN LA NUEVA LISTA
     CANCION* aux_c = queue_front(cola_rep);
     while(aux_c!=NULL){
         list_pushBack(nueva_pl->canciones, aux_c);
-        act_generos(nueva_pl,aux_c,1); //--------------------------
+        act_generos(nueva_pl,aux_c,1); 
         aux_c = queue_next(cola_rep);
     }
-    
     //SE INSERTA LA PLAYLIST EN EL MAPA DE PLAYLIST 
     map_insert(mapa_PL, nueva_pl->nombre_playlist, nueva_pl);
     printf("¡Playlist %s creada con Éxito!\n", nueva_pl->nombre_playlist);
 }
 
 // -case 1.1
-void crear_PL(Map* mapa_PL, Queue* cola_rep){ //NS SI AQUI SE VE LO DE LOS GENEROS 
+void crear_PL(Map* mapa_PL, Queue* cola_rep){  
     //SI ES QUE LA COLA EXISTE, SE PREGUNTA SI ES QUE QUIERE CREAR LA PLAYLIST A PARTIR DE ELLA 
     if (queue_front(cola_rep) != NULL){
         char resp;
         do {
         puts("¿Desea crear una Playlist a partir de su Cola de Reproducción? (s/n)");
         scanf(" %c", &resp);
-        //SI DICE QUE SI, SE LLAMA A LA FUNCION CORRESPONDIENTE
-        //HAY UN PROBLEMA CON ESTA FX, NO GUARDA BIEN EL NOMBRE A MENOS QUE SEA CARACTER :( 
+        //SI DICE QUE SI, SE LLAMA A LA FUNCION CORRESPONDIENTE 
         if (resp=='s') {
             crear_PL_cola(mapa_PL, cola_rep);
             return;
@@ -344,8 +338,8 @@ void crear_PL(Map* mapa_PL, Queue* cola_rep){ //NS SI AQUI SE VE LO DE LOS GENER
     }
     //SE LE SOLICITA A LA USUARIA QUE ELIJA UN NOMBRE PARA SU PLAYLIST 
     puts("Ingrese un Nombre para su Playlist (máx 30 caracteres): ");
-    char nombre[30];
-    scanf(" %29[^\n]", nombre);
+    char nombre[31];
+    scanf(" %30[^\n]", nombre);
     //SE VERIFICA QUE NO HAYA UNA PLAYLIST CON ESE NOMBRE. SI HAY UNA, SE DA UN AVISO Y SE RETORNA AL MENU DE PLAYLISTS
     MapPair * par_PL = map_search(mapa_PL, nombre);
     if(par_PL != NULL){
@@ -355,23 +349,18 @@ void crear_PL(Map* mapa_PL, Queue* cola_rep){ //NS SI AQUI SE VE LO DE LOS GENER
     //SI EL NOMBRE NO ESTÁ REGISTRADO, SE CREA UNA NUEVA PLAYLIST Y SE INICIALIZAN SUS ATRIBUTOS
     PLAYLIST* nueva_pl= (PLAYLIST*)malloc(sizeof(PLAYLIST));
     strcpy(nueva_pl->nombre_playlist, nombre);
-
+    //SE CREA LISTA DE CANCIONES VACIA Y SE GUARDA EN LA PLAYLIST
     List* nueva_canciones= list_create();
     nueva_pl->canciones= nueva_canciones;
-
+    //SE CREA LISTA DE CANCIONES RECOMENDADAS Y SE GUARDA EN LA PLAYLIST
     List* nueva_recomedadas= list_create();
     nueva_pl->canciones_recomendadas= nueva_recomedadas;
-
+    //SE CREA MAPA DE GENEROS VACIA Y SE GUARDA EN LA PLAYLIST
     Map* nueva_generos= map_create(is_equal_str); 
     nueva_pl->generos_p= nueva_generos;
-
     //SE INSERTA LA NUEVA PLAYLIST AL MAPA DE PLAYLISTS
     map_insert(mapa_PL, nueva_pl->nombre_playlist, nueva_pl);
-    //printf("¡Playlist %s creada con Éxito!\n", nueva_pl->nombre_playlist);
-    //FALTA MSJ DE ERROR*** pero ns como ver si hubo error :o 
-    MapPair * par_verificar = map_search(mapa_PL, nueva_pl->nombre_playlist);
-    if(par_verificar != NULL) printf("¡Playlist %s creada con Éxito!\n", nueva_pl->nombre_playlist);
-    else printf("Hubo un Error al Crear la Playlist. key= %s\n", par_verificar->key);
+    printf("¡Playlist %s creada con Éxito!\n", nueva_pl->nombre_playlist); 
 }
 
 // -case 2
@@ -383,8 +372,8 @@ void anadir_cancion_PL(Map* archivo_c, Map* mapa_PL){
     }
     //SE PREGUNTA QUE CANCION DESEA AÑADIR A LA PLAYLIST
     puts("¿Qué canción desea guardar?: ");
-    char nombre_c_agregar[30];
-    scanf(" %29[^\n]", nombre_c_agregar);
+    char nombre_c_agregar[151];
+    scanf(" %150[^\n]", nombre_c_agregar);
     //SE BUSCA EL PAR DE LA CANCION QUE SE DESEA AGREGAR, SI ESTE ES NULO ES PORQUE NO EXISTE EN EL ARCHIVO
     MapPair * par_cancion = map_search(archivo_c, nombre_c_agregar);
     if(par_cancion == NULL){
@@ -398,8 +387,8 @@ void anadir_cancion_PL(Map* archivo_c, Map* mapa_PL){
     mostrar_PL_guardadas(mapa_PL);
     //SE PREGUNTA A QUE PLAYLIST DESEA AGREGAR LA CANCION
     puts("¿A qué Playlist desea agregarla?: ");
-    char nombre_p_agregar[30];
-    scanf("%s", nombre_p_agregar);
+    char nombre_p_agregar[31];
+    scanf(" %30[^\n]", nombre_p_agregar);
     //SE BUSCA LA PLAYLIST EN EL MAPA DE PLAYLISTS. SI ESTE NO EXISTE, SE DA UN AVISO Y SE RETORNA
     MapPair * par_PL = map_search(mapa_PL, nombre_p_agregar);
     if(par_PL == NULL){
@@ -411,11 +400,10 @@ void anadir_cancion_PL(Map* archivo_c, Map* mapa_PL){
     list_pushBack(playlist_agregar->canciones, cancion_agregar);
     act_generos(playlist_agregar,cancion_agregar,1); //Se llama a la función que actualiza los géneros del mapa de géneros y su frecuencia
     printf("¡%s Agregada con Éxito a %s!", cancion_agregar->cancion, playlist_agregar->nombre_playlist);
-    //FALTA MSG ERROR
 }
 
 // -case 3
-void eliminar_cancion_PL(Map* archivo_c, Map* mapa_PL){ //FALTA BAJAR FRECUENCIA DEL GENERO 
+void eliminar_cancion_PL(Map* archivo_c, Map* mapa_PL){  
     //SI EL MAPA DE PLAYLISTS ESTA VACIO, SE DA UN AVISO Y SE RETORNA
     if (map_first(mapa_PL)==NULL) {
         puts("No se ha creado Ninguna Playlist. Cree al menos una.");
@@ -425,8 +413,8 @@ void eliminar_cancion_PL(Map* archivo_c, Map* mapa_PL){ //FALTA BAJAR FRECUENCIA
     mostrar_PL_guardadas(mapa_PL);
     //SE PREGUNTA A QUÉ PLAYLIST LE QUIERE ELIMINAR UNA CANCION
     puts("¿Qué Playlist desea Modificar?");
-    char nombre_pc_eliminar[30];
-    scanf(" %29[^\n]", nombre_pc_eliminar);
+    char nombre_pc_eliminar[31];
+    scanf(" %30[^\n]", nombre_pc_eliminar);
     //SE BUSCA LA PLAYLIST EN EL MAPA DE PLAYLISTS. SI ESTE NO EXISTE, SE DA UN AVISO Y SE RETORNA
     MapPair * par_PL = map_search(mapa_PL, nombre_pc_eliminar);
     if(par_PL == NULL){
@@ -450,8 +438,8 @@ void eliminar_cancion_PL(Map* archivo_c, Map* mapa_PL){ //FALTA BAJAR FRECUENCIA
     }
     //SE PREGUNTA LA CANCIÓN QUE DESEA ELIMINAR
     puts("¿Qué canción desea eliminar?: ");
-    char nombre_c_eliminar[30];
-    scanf(" %29[^\n]", nombre_c_eliminar);
+    char nombre_c_eliminar[151];
+    scanf(" %150[^\n]", nombre_c_eliminar);
     //SE BUSCA EL PAR DE LA CANCION QUE SE DESEA ELIMINAR, SI ESTE ES NULO ES PORQUE NO EXISTE EN EL ARCHIVO
     MapPair * par_cancion = map_search(archivo_c, nombre_c_eliminar);
     if(par_cancion == NULL){
@@ -514,7 +502,7 @@ char* encontrar_genero_top(Map* generos_p){
         par= map_next(generos_p);
     }
 
-    return genero_top; //Se retor4na el género con la mayor frecuencia en el mapa
+    return genero_top; //Se retorna el género con la mayor frecuencia en el mapa
 }
 
 void canciones_rec(PLAYLIST* playlist, Map* canciones_g){
@@ -594,8 +582,8 @@ void mostrar_PL(Map* mapa_PL, Map* canciones_g){
     mostrar_PL_guardadas(mapa_PL);
     //SE LE PREGUNTA LA PLAYLIST QUE QUIERE VER
     puts("¿Qué Playlist desea Ver?: ");
-    char nombre_p_mostrar[30];
-    scanf(" %29[^\n]", nombre_p_mostrar);
+    char nombre_p_mostrar[31];
+    scanf(" %30[^\n]", nombre_p_mostrar);
     //SE BUSCA EL PAR DE LA PLAYLIST. SI ESTE ES NULO, ES PORQUE NO EXISTE Y SE DA UN AVISO
     MapPair * par_PL = map_search(mapa_PL, nombre_p_mostrar);
     if(par_PL == NULL){
@@ -615,6 +603,9 @@ void mostrar_PL(Map* mapa_PL, Map* canciones_g){
             aux= list_next(playlist_mostrar->canciones);
         }
     }
+
+    canciones_rec(playlist_mostrar, canciones_g);
+
     //SE MUESTRAN SUS CANCIONES RECOMENDADAS. SI NO TIENE, PORQUE NO HAY CANCIONES GUARDADAS, SE DA UN AVISO 
     puts("Canciones Recomendadas: ");
     if (list_first(playlist_mostrar->canciones_recomendadas)==NULL) printf("No hay canciones Recomendadas en %s\n", playlist_mostrar->nombre_playlist);
@@ -629,7 +620,7 @@ void mostrar_PL(Map* mapa_PL, Map* canciones_g){
 
 // -case 5
 void eliminar_PL(Map* mapa_PL){
-    //SI EL MAPA DE PLAYLISTS ESTA VACIO, SE DA UN AVISO Y SE RETORNA
+    //SI EL MAPA DE PLAYLISTS ESTA VACIO, SE DA UN AVISO Y SE RETORNA.
     if (map_first(mapa_PL)==NULL) {
         puts("No se ha creado Ninguna Playlist. Cree al menos una.");
         return;
@@ -638,8 +629,8 @@ void eliminar_PL(Map* mapa_PL){
     mostrar_PL_guardadas(mapa_PL);
     //SE LE PREGUNTA LA PLAYLIST QUE QUIERE ELIMINAR
     puts("¿Qué Playlist desea Eliminar?: ");
-    char nombre_p_eliminar[30];
-    scanf(" %29[^\n]", nombre_p_eliminar);
+    char nombre_p_eliminar[31];
+    scanf(" %30[^\n]", nombre_p_eliminar);
     //SE BUSCA EL PAR DE LA PLAYLIST. SI ESTE ES NULO, ES PORQUE NO EXISTE Y SE DA UN AVISO
     MapPair * par_PL = map_search(mapa_PL, nombre_p_eliminar);
     if(par_PL == NULL){
@@ -659,10 +650,7 @@ void eliminar_PL(Map* mapa_PL){
     MapPair* playlist_eliminar= map_remove(mapa_PL, par_PL->key);
     //SE LIBERA LA MEMORIA RESERVADA PARA LA PLAYLIST Y SE DA UN AVISO
     free(playlist_eliminar->value);
-    //QUE EL AVISO DE ERROR SE ENCUENTRE BUSCANDO NUEVAMENTE EL PAR :
-    MapPair * par_verificar = map_search(mapa_PL, nombre_p_eliminar);
-    if(par_verificar == NULL) printf("Se ha Eliminado %s con Éxito.\n", nombre_p_eliminar);
-    else printf("Hubo un Error al Eliminar la Playlist. key= %s\n", par_verificar->key);
+    printf("Se ha Eliminado %s con Éxito.\n", nombre_p_eliminar);
 }
 
 void menu_playlists(Map* archivo_c, Map* mapa_PL, Queue* cola_repro, Map* canciones_g){ 
