@@ -16,32 +16,42 @@ typedef struct {
 } CANCION;
 
 typedef struct {
-    char nombre[30];
+    char nombre[100];
     int frecuencia;
 } ARTISTA; 
 
 typedef struct {
-    char nombre_playlist[30];
-    List * canciones;
+    char nombre_playlist[31];
+    List * canciones;  
     List * canciones_recomendadas;
     Map * generos_p;
 } PLAYLIST;
 
+int is_equal_str(void *key1, void *key2) {
+    return strcmp((char *)key1, (char *)key2) == 0;
+}
+
 void act_generos(PLAYLIST* playlist, CANCION* cancion, int OP);
 
 void leer_playlists(Map * mapa_PL){
+    // Se inicializa un contador en 1 para construir el nombre de los archivos
     int contador = 1;
     while(1){
         char nombre_archivo[50];
         char nombre_pl[50];
         char nombre_pl_archivo[50];
+        // Se construye el nombre del archivo de las canciones de la playlist
         sprintf(nombre_archivo, "playlist/playlist_%d.bin", contador);
 
+        // Se abre el archivo binario de las canciones de la playlist en modo lectura
         FILE * archivo = fopen(nombre_archivo, "rb");
         if(archivo == NULL) break;
 
+        // Se construye el nombre del archivo del nombre de la playlist
         sprintf(nombre_pl_archivo, "playlist/nombre_playlist_%d.txt", contador);
+        // Se abre el archivo con el nombre de la playlist en modo lectura
         FILE * archivo_nombre = fopen(nombre_pl_archivo, "r");
+        // Se lee el contenido del archivo (Nombre de la playlist) y se tratan los posibles errores
         if(archivo_nombre != NULL){
             if(fscanf(archivo_nombre, " %[^\n]", nombre_pl) != 1) strcpy(nombre_pl, "ERROR AL LEER EL NOMBRE");
             fclose(archivo_nombre);
@@ -49,49 +59,57 @@ void leer_playlists(Map * mapa_PL){
         else{
             strcpy(nombre_pl, "ERROR AL LEER EL NOMBRE");
         }
-
+        // Se asigna memoria a la playlist que esta dentro del archivo
         PLAYLIST * pl = (PLAYLIST *) malloc(sizeof(PLAYLIST));
 
+        // Se guarda el nombre de la playlist leído anteriormente del archivo
         strcpy(pl -> nombre_playlist, nombre_pl);
+        // Se inicializan las listas y mapas de la playlist
         pl -> canciones = list_create();
         pl -> canciones_recomendadas = list_create();
         pl -> generos_p = map_create(is_equal_str);
 
+        // Se crea una variable auxiliar para leer las canciones dentro del archivo de las canciones
         CANCION temp;
 
+        // Se leen todas las canciones del archivo de canciones de la playlist
         while(fread(&temp, sizeof(CANCION), 1, archivo) == 1){
             CANCION * song = (CANCION *) malloc(sizeof(CANCION));
             *song = temp;
+            // Se añade la canción a la playlist
             list_pushBack(pl -> canciones, song);
+            // Se añade el género de la canción o se actualiza su frecuencia al mapa de géneros de la playlist
             act_generos(pl, song, 1);
         }
-
+        // Se inserta la playlist en el mapa de playlist
         map_insert(mapa_PL, pl -> nombre_playlist, pl);
+        // Se cierra el archivo que contiene las canciones de la playlist
         fclose(archivo);
+        // Se le suma uno al contador para seguir buscando archivos
         contador++;
     }
 }
 
 CANCION * leer_cancion_fav(){
-    CANCION fav_song;
+    // Se reserva memoria para la canción favorita
     CANCION * cancion_fav = (CANCION *) malloc(sizeof(CANCION));
+    // Se abre el archivo de la canción favorita en modo lectura
     FILE* archivo = fopen("cancion_fav.bin", "rb");
+    // Si no se pudo leer el archivo, este se crea
     if(archivo == NULL){
         FILE* archivo = fopen("cancion_fav.bin", "wb");
         fclose(archivo);
     }
+    // Si se pudo abrir, se lee la canción favorita de la usuaria y se retorna
     else{
-        int leidos = fread(&fav_song, sizeof(CANCION), 1, archivo);
+        int leidos = fread(cancion_fav, sizeof(CANCION), 1, archivo);
         if(leidos == 1){
-            strcpy(cancion_fav -> cancion, fav_song.cancion);
-            strcpy(cancion_fav -> artista, fav_song.cancion);
-            strcpy(cancion_fav -> genero, fav_song.genero);
-            cancion_fav -> anyo = fav_song.anyo;
-            cancion_fav -> duracion = fav_song.duracion;
+            // Se cierra el archivo
             fclose(archivo);
             return cancion_fav;
         }
     }
+    // En caso de que no se pudo abrir el archivo, se libera la memoria de la variable creada y se cierra el archivo
     fclose(archivo);
     free(cancion_fav);
     return NULL;
@@ -109,8 +127,10 @@ void mostrar_menu_principal(CANCION * cancion_fav, CANCION * song){
     puts("4) Mis Playlists");
     puts("5) Mi Cola de Reproducción");
     puts("6) Salir");
-    if(cancion_fav != NULL) printf("Tu canción favorita :D : %s\n", cancion_fav -> cancion);
+    // Si la usuaria ingreso su canción favorita esta se muestra por pantalla
+    if(cancion_fav != NULL) printf("Tu canción favorita :D : %s | %s\n", cancion_fav -> cancion, cancion_fav -> artista);
     else printf("No has ingresado tu canción favorita! D:\n");
+    // Si hay una cola activa, se muestra la primera canción que este dentro de la cola
     if(song != NULL) printf("Sonando: %s \n", song -> cancion);
 }
 
@@ -142,10 +162,11 @@ void mostrar_menu_cola(){
 }
 
 // FUNCIONES EXTRA
+
 void mostrar_info_canciones(CANCION * song){
     printf("\n");
-    printf("|| TÍTULO: %s | ARTISTA: %s | GÉNERO: %s | AÑO PUBLICACIÓN: %d | DURACIÓN: %d",
-        song -> cancion, song -> artista, song -> genero, song -> anyo, song -> duracion);
+    printf("|| TÍTULO: %s | ARTISTA: %s | GÉNERO: %s | AÑO PUBLICACIÓN: %d | DURACIÓN: %d:%d",
+        song -> cancion, song -> artista, song -> genero, song -> anyo, (song -> duracion) / 60, (song -> duracion) % 60);
     printf("\n");
 }
 
@@ -158,37 +179,43 @@ void mostrar_PL_guardadas(Map* mapa_PL){
     }
 }
 
-int is_equal_str(void *key1, void *key2) {
-    return strcmp((char *)key1, (char *)key2) == 0;
-}
-
 void cargar_canciones(Map * canciones, Map * canciones_g){
+    // Se abre el archivo csv que contiene las canciones
     FILE * archivo = fopen("data/Spotify Dataset.csv", "r");
+    // Tratamiento de error por si el archivo no se puede abrir
     if(archivo == NULL){
         perror("Error al abrir el archivo");
         return;
     }
 
     char **campos;
-
+    // Se lee la linea de encabezados del archivo csv
     campos = leer_linea_csv(archivo, ',');
 
+    // Se leen las lineas del archivo csv
     while((campos = leer_linea_csv(archivo, ',')) != NULL){
+        // Se reserva memoria para la canción
         CANCION * song = (CANCION *) malloc(sizeof(CANCION));
+        // Se guardan los datos de la canción
         strcpy(song -> cancion, campos[0]);
         strcpy(song -> artista, campos[1]);
         strcpy(song -> genero, campos[2]);
         song -> anyo = atoi(campos[3]);
         song -> duracion = atoi(campos[21]);
 
+        // Se inserta la canción dentro del mapa de canciones
         map_insert(canciones, song -> cancion, song);
 
+        // Se busca el género de la canción dentro del mapa de géneros
         MapPair * genre_pair = map_search(canciones_g, song -> genero);
+        // Si el género no se encuentra dentro de este se añade y se crea una lista de canciones
         if(genre_pair == NULL){
             List * nueva_lista = list_create();
+            // Se inserta la canción en la lista de canciones del género
             list_pushBack(nueva_lista, song);
             map_insert(canciones_g, song -> genero, nueva_lista);
         }
+        // Si el género ya existe, solo se obtiene la lista de canciones y se añade la nueva canción a esta
         else{
             List * lista_g = (List *) genre_pair -> value;
             list_pushBack(lista_g, song);
@@ -196,12 +223,16 @@ void cargar_canciones(Map * canciones, Map * canciones_g){
     }
 }
 
+// 1 VER ARCHIVO DE CANCIONES 
 void ver_archivo(Map * canciones){
+    // Se obtiene la primera canción del mapa de canciones
     MapPair * song_pair = map_first(canciones);
+    // Si esta canción es nula, se avisa del error y se retorna
     if(song_pair == NULL){
         printf("Error al cargar el archivo. Por favor, intente nuevamente");
         return;
     }
+    // Se itera sobre el mapa de canciones mostrando la información de cada una de las canciones
     while(song_pair != NULL){
         mostrar_info_canciones(song_pair -> value);
         song_pair = map_next(canciones);
@@ -210,18 +241,28 @@ void ver_archivo(Map * canciones){
 
 // 3 CANCION FAV
 void guardar_cancion_fav(CANCION  fav_song){
+    // Se abre el archivo donde se guarda la canción favorita en modo escritura
     FILE * archivo = fopen("cancion_fav.bin", "wb");
+    // Si el archivo se pudo abrir se guarda la canción favorita ingresada por la usuaria
     if(archivo != NULL){
         fwrite(&fav_song, sizeof(CANCION), 1, archivo);
     }
+    // Se cierra el archivo
     fclose(archivo);
 }
 
 void cancion_favorita(Map * canciones, CANCION ** cancion_fav){
     char fav_song[150];
     int encontrado = 0;
-
+    int contador = 0;
     do{
+        if(contador >= 3){
+            char opcion;
+            puts("Desea continuar? (s/n)");
+            scanf("%s", &opcion);
+            if(opcion == 's') contador = 0;
+            else return;
+        }
         printf("Ingrese su canción favorita: \n");
         scanf(" %[^\n]", fav_song);
 
@@ -233,8 +274,9 @@ void cancion_favorita(Map * canciones, CANCION ** cancion_fav){
             return;
         }
         else{
-            printf("Esa canción no se encuentra en el catálogo");
+            printf("Esa canción no se encuentra en el catálogo\n");
         }
+        contador++;
     } while(encontrado != 1);
 }
 // 4 MIS PLAYLISTS
@@ -944,7 +986,7 @@ int main()
     char opcion;
 
     Map * mapa_PL = map_create(is_equal_str);
-    leer_playlist(mapa_PL);
+    leer_playlists(mapa_PL);
     Map * canciones = map_create(is_equal_str);
     Map * canciones_g = map_create(is_equal_str);
     CANCION * cancion_fav = leer_cancion_fav();
