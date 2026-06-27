@@ -95,10 +95,14 @@ CANCION * leer_cancion_fav(){
     CANCION * cancion_fav = (CANCION *) malloc(sizeof(CANCION));
     // Se abre el archivo de la canción favorita en modo lectura
     FILE* archivo = fopen("cancion_fav.bin", "rb");
-    // Si no se pudo leer el archivo, este se crea
+    // Si no se pudo leer el archivo, este se crea y se retorna
     if(archivo == NULL){
-        FILE* archivo = fopen("cancion_fav.bin", "wb");
-        fclose(archivo);
+        //se crea el archivo nuevo
+        FILE* archivo_nuevo = fopen("cancion_fav.bin", "wb");
+        //se cierra el archivo nuevo y se libera la memoria de la variable creada
+        if (archivo_nuevo != NULL) fclose(archivo_nuevo);
+        free(cancion_fav);
+        return NULL;
     }
     // Si se pudo abrir, se lee la canción favorita de la usuaria y se retorna
     else{
