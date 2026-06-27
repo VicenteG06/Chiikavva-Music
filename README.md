@@ -38,7 +38,6 @@ Este sistema ha sido desarrollado en lenguaje C y puede ejecutarse fácilmente a
 -  Agregar o eliminar canciones a la Playlist.
 -  Mostrar Playlist.
 -  Algoritmo de Recomendación.
--  Eliminar Playlist.
 
 -  Iniciar una Cola de Reproducción.
 -  Agregar o eliminar canciones a la Cola de Reproducción.
@@ -57,6 +56,7 @@ Este sistema ha sido desarrollado en lenguaje C y puede ejecutarse fácilmente a
 - No existe una validación de entrada (input) al momento de ingresar texto, por lo que se deben ingresar como máximo la cantidad de caracteres que se pide. Y si es que se piden números o letras se *DEBE* ingresar el tipo correspondiente.
 - Los nombres de las canciones y playlists son únicos, por lo que al querer agregar o eliminar alguna de estas, el nombre debe ser escrito tal como se registró en el archivo, de lo contrario el sistema no lo reconocerá (“HOLA” no es lo mismo que “hola”).
 - Cuando aparece el mensaje "*Presione una tecla para continuar...*", la única opción válida que permite continuar es *Enter*.
+- La función para eliminar playlist funciona solamente en VS Code ya que utiliza comandos de Windows que Replit no puede utilizar
 
 ### A mejorar:
 - Implementar una validación de entrada que limite el largo del texto y que valide si es que el tipo de dato ingresado (número, texto) corresponde al solicitado.
