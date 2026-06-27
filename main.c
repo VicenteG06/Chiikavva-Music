@@ -256,23 +256,33 @@ void cancion_favorita(Map * canciones, CANCION ** cancion_fav){
     int encontrado = 0;
     int contador = 0;
     do{
+        /* 
+        Se pregunta si el usuario quiere continuar añadiendo su canción favorita 
+        si es que se equivoca al escribir 3 veces o más
+        */
         if(contador >= 3){
             char opcion;
             puts("Desea continuar? (s/n)");
             scanf("%s", &opcion);
+            // Si el usuario desea continuar, se resetea el contador
             if(opcion == 's') contador = 0;
+            // Si no, se retorna
             else return;
         }
+        // Se le pregunta a la usuaria su canción favorita
         printf("Ingrese su canción favorita: \n");
         scanf(" %[^\n]", fav_song);
 
+        // Se busca la canción en el mapa de canciones
         MapPair * song_pair = map_search(canciones, fav_song);
+        // Si la canción existe, se guarda en archivo y en una variable y se retorna al menú principal
         if(song_pair != NULL){
             *cancion_fav = song_pair -> value;
             guardar_cancion_fav(**cancion_fav);
             encontrado = 1;
             return;
         }
+        // Si la canción no existe, se avisa y se le vuelve a preguntar a la usuaria por su canción favorita
         else{
             printf("Esa canción no se encuentra en el catálogo\n");
         }
@@ -579,8 +589,6 @@ void canciones_rec(PLAYLIST* playlist, Map* canciones_g){
     }
 
     free(dispo); //liberamos el arreglo temporal de canciones disponibles para recomendar
-
-    
 }
 
 // -case 4
@@ -615,8 +623,11 @@ void mostrar_PL(Map* mapa_PL, Map* canciones_g){
             aux= list_next(playlist_mostrar->canciones);
         }
     }
-    //SE MUESTRAN SUS CANCIONES RECOMENDADAS. SI NO TIENE, PORQUE NO HAY CANCIONES GUARDADAS, SE DA UN AVISO 
+
     puts("Canciones Recomendadas: ");
+
+    //SE MUESTRAN SUS CANCIONES RECOMENDADAS. SI NO TIENE, PORQUE NO HAY CANCIONES GUARDADAS, SE DA UN AVISO 
+    canciones_rec(playlist_mostrar, canciones_g);
     if (list_first(playlist_mostrar->canciones_recomendadas)==NULL) printf("No hay canciones Recomendadas en %s\n", playlist_mostrar->nombre_playlist);
     else {
         CANCION* aux2= list_first(playlist_mostrar->canciones_recomendadas);
@@ -760,72 +771,115 @@ void mostrar_top3(Map *artistas){
 
 // 5 MI COLA DE REPRODUCCION
 void iniciar_cola(Map * canciones, Queue * cola_repro, Map *artistas){
+    // Si ya había una cola activa, esta se vacía para iniciar una nueva
     if(queue_front(cola_repro) != NULL) queue_clean(cola_repro); 
     char song_user[150];
     int encontrado = 0;
+    int intentos = 0;
     do{
+        /* 
+        Se pregunta si el usuario quiere continuar añadiendo su canción favorita 
+        si es que se equivoca al escribir 3 veces o más
+        */
+        if(intentos >= 3){
+            char opcion;
+            puts("Desea continuar? (s/n)");
+            scanf("%s", &opcion);
+            if(opcion == 's') intentos = 0;
+            else return;
+        }
+        // Se le pide a la usuaria una canción para iniciar la cola
         printf("Ingrese una canción a la cola: ");
         scanf(" %[^\n]", song_user);
 
+        // Se busca la canción dentro del mapa de canciones
         MapPair * song_pair = map_search(canciones, song_user);
+        // Si la canción se encuentra dentro del mapa esta se inserta dentro de la cola y se devuelve al menú
         if(song_pair != NULL){
             CANCION *cancion_insertada = (CANCION *)song_pair->value;
             queue_insert(cola_repro, cancion_insertada);
+            // Se actualiza la frecuencia de los artistas del mapa de artistas
             actualizar_frecuencia_art(artistas, cancion_insertada->artista);
             encontrado = 1;
             return;
         }
+        // Si la canción no se encuentra dentro del archivo, se avisa y se le pregunta nuevamente a la usuaria por la canción a agregar
         else{
             printf("Esa canción no se encuentra en el catálogo.\n");
         }
+        // Se le suma uno al contador de intentos
+        intentos++;
     } while(encontrado != 1);
 }
 
 void anadir_cancion(Map * canciones, Queue * cola_repro, Map *artistas){
-
+    // Si no hay ninguna cola activa se le pregunta al usuario si desea iniciar una
     if(queue_front(cola_repro) == NULL){
         char opcion;
         printf("No existe ninguna cola activa!\n");
         printf("Desea iniciar una? (s/n)\n");
         scanf(" %c", &opcion);
+        // Si desea iniciar una, se le redirecciona a la función de iniciar cola
         if(opcion == 's') iniciar_cola(canciones, cola_repro, artistas);
+        // Si no desea iniciar una, se le devuelve al menú
         return;
     }
 
     char song_user[150];
     int encontrado = 0;
+    int intentos = 0;
     do{
+        /* 
+        Se pregunta si el usuario quiere continuar añadiendo su canción favorita 
+        si es que se equivoca al escribir 3 veces o más
+        */
+        if(intentos >= 3){
+            char opcion;
+            puts("Desea continuar? (s/n)");
+            scanf("%s", &opcion);
+            if(opcion == 's') intentos = 0;
+            else return;
+        }
+        
+        // Se le pregunta a la usuaria que canción desea añadir a la cola
         printf("Ingrese una nueva canción a la cola :");
         scanf(" %[^\n]", song_user);
-
+        // Se busca la canción en el mapa de canciones
         MapPair * song_pair = map_search(canciones, song_user);
+        // Si la canción se encuentra en el mapa de canciones se inserta en la cola y se devuelve al menú
         if(song_pair != NULL){
             CANCION *cancion_insertada = (CANCION *)song_pair->value;
             queue_insert(cola_repro, cancion_insertada);
+            // Se actualiza la frecuencia del artista en el mapa de artistas
             actualizar_frecuencia_art(artistas, cancion_insertada->artista);
             encontrado = 1;
             return;
         }
+        // Si no se encuentra, se avisa y se le vuelve a preguntar a la usuaria por la canción a agregar
         else{
             printf("Esa canción no se encuentra en el catálogo.\n");
         }
+        // Se le suma uno al contador de intentos
+        intentos++;
     } while(encontrado != 1);
 }
 
 void eliminar_cancion(Queue * cola_repro){
-
+    // Si no hay ninguna cola activa, se avisa y se devuelve al menú
     if(queue_front(cola_repro) == NULL){
         printf("No hay ninguna cola activa!\n");
         return;
     }
 
     char song_user[150];
-
+    // Se le pregunta a la usuaria que canción de su cola desea eliminar
     printf("Ingrese el nombre de la canción a eliminar: ");
     scanf(" %[^\n]", song_user);
-    
+
+    // Se recorre la cola en busca de la canción
     CANCION * song_aux = queue_front(cola_repro);
     while(song_aux != NULL){
+        // Si la canción se encuentra dentro de la cola, se elimina y se imprime por pantalla un mensaje indicandolo
         if(strcmp(song_aux -> cancion, song_user) == 0){
             CANCION* deleted_song = queue_removeCurrent(cola_repro);
             printf("Canción eliminada correctamente!\n");
@@ -833,17 +887,19 @@ void eliminar_cancion(Queue * cola_repro){
         }
         song_aux = queue_next(cola_repro);
     }
+    // Si la canción no se encuentra dentro de la cola, se le avisa por pantalla a la usuaria
     printf("Esta canción no se encuentra en tu cola!\n");
 }
 
 void mostrar_cola(Queue * cola_repro){
     CANCION * song_aux = queue_front(cola_repro);
-
+    // Si no hay ninguna cola activa, se avisa y se devuelve al menú
     if(song_aux == NULL){
         printf("No hay ninguna cola activa!\n");
         return;
     }
 
+    // Se recorre toda la cola mostrando la información de cada una de sus canciones
     while(song_aux != NULL){
         mostrar_info_canciones(song_aux);
         song_aux = queue_next(cola_repro);
@@ -851,28 +907,39 @@ void mostrar_cola(Queue * cola_repro){
 }
 
 void sgte_cancion(Queue * cola_repro){
+    // Si no hay ninguna cola activa, se avisa y se devuelve al menú
     if(queue_front(cola_repro) == NULL){
         printf("No hay ninguna cola activa!\n");
         return;
     }
-
+    // Se quita la primera canción de la cola
     CANCION * deleted_song = queue_remove(cola_repro);
-
+    
+    // Si hay una canción dentro de la cola aún se imprime por pantalla la información de esta
     CANCION * next_song = queue_front(cola_repro);
     if(next_song != NULL){
         printf("Ahora está sonando: \n");
         mostrar_info_canciones(next_song);
     }
+    // Si la cola queda vacía se avisa y se devuelve al menú
     else printf("Se ha terminado la cola!\n");
 }
 
+
 void eliminar_cola(Queue* cola_repro){
+    // Si no hay ninguna cola activa, se avisa y se devuelve al menú
     if(queue_front(cola_repro) == NULL){
         printf("No hay ninguna cola activa!\n");
         return;
     }
-
+    // Se limpia la cola
     queue_clean(cola_repro);
+    if(queue_front != NULL){
+        // Si la cola falla al ser vaciada, se avisa y se devuelve al menú
+        printf("Error al vaciar la cola, intentelo nuevamente\n");
+        return;
+    }
+    // Si no falla se indica que se ha eliminado correctamente
     printf("Se ha eliminado correctamente la cola! \n");
 }
 
@@ -905,13 +972,14 @@ void menu_cola(Map * canciones, Queue * cola_repro, Map *artistas){
             eliminar_cola(cola_repro);
             break;
         case '7':
-            puts("Saliendo del menú.....");
+            puts("Saliendo del menú...");
             break;
         default:
             puts("Opción no válida. Por favor intente nuevamente.");
 
         }
-        presioneTeclaParaContinuar();
+        printf("\n");
+        if(opcion != '7') presioneTeclaParaContinuar();
     } while(opcion != '7');
 }
 
@@ -985,16 +1053,16 @@ int main()
 {
     char opcion;
 
-    Map * mapa_PL = map_create(is_equal_str);
-    leer_playlists(mapa_PL);
-    Map * canciones = map_create(is_equal_str);
-    Map * canciones_g = map_create(is_equal_str);
-    CANCION * cancion_fav = leer_cancion_fav();
-    Queue * cola_repro = queue_create(cola_repro);
-    Map *mapa_artistas = map_create(is_equal_str);
-    cargar_canciones(canciones, canciones_g);
-    cargar_artistas(mapa_artistas);
-    printf("Archivo Cargado!\n");
+    Map * mapa_PL = map_create(is_equal_str); // Se inicia el mapa de playlist
+    leer_playlists(mapa_PL); // Se leen los archivos de las playlists
+    Map * canciones = map_create(is_equal_str); // Se inicia el mapa de canciones
+    Map * canciones_g = map_create(is_equal_str); // Se incia el mapa de generos de canciones
+    CANCION * cancion_fav = leer_cancion_fav(); // Se lee el archivo de canción favorita
+    Queue * cola_repro = queue_create(cola_repro); // Se inicia la cola de reproducción
+    Map *mapa_artistas = map_create(is_equal_str); // Se inicia el mapa de artistas
+    cargar_canciones(canciones, canciones_g); // Se cargan las canciones del archivo csv
+    cargar_artistas(mapa_artistas); // Se cargan los artistas más escuchados desde el archivo
+    printf("Archivo Cargado!\n"); // Se imprime por pantalla un aviso de archivo cargado
     presioneTeclaParaContinuar();
 
     do{
@@ -1019,8 +1087,8 @@ int main()
             menu_cola(canciones, cola_repro, mapa_artistas);
             break;
         case '6':
-            guardar_artistas(mapa_artistas);
-            guardar_playlist(mapa_PL);
+            guardar_artistas(mapa_artistas); // Se guardan en un archivo el top 3 artistas de la usuaria
+            guardar_playlist(mapa_PL); // Se guardan en un archivo las playlists creadas por la usuaria
             puts("Saliendo del programa.....");
             break;
         default:
