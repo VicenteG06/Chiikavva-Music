@@ -57,7 +57,6 @@ Este sistema ha sido desarrollado en lenguaje C y puede ejecutarse fácilmente a
 - No existe una validación de entrada (input) al momento de ingresar texto, por lo que se deben ingresar como máximo la cantidad de caracteres que se pide. Y si es que se piden números o letras se *DEBE* ingresar el tipo correspondiente.
 - Los nombres de las canciones y playlists son únicos, por lo que al querer agregar o eliminar alguna de estas, el nombre debe ser escrito tal como se registró en el archivo, de lo contrario el sistema no lo reconocerá (“HOLA” no es lo mismo que “hola”).
 - Cuando aparece el mensaje "*Presione una tecla para continuar...*", la única opción válida que permite continuar es *Enter*.
-- Si se ingresan espacios al nombrar Playlist o agregar Canciones, solo se tomarán los caracteres antes del espacio, y los que estén después del espacio se tomarán como nuevos registros de la usuaria, por lo que si se ingresa una cadena, un espacio, y un numero, el número se tomará como que el usuario seleccionó la opción correspondiente a ese número.
 
 ### A mejorar:
 - Implementar una validación de entrada que limite el largo del texto y que valide si es que el tipo de dato ingresado (número, texto) corresponde al solicitado.
@@ -185,7 +184,7 @@ Ahora en el menú principal, se mostrará la canción favorita de la usuaria.
 ### Paso 1: Top 3 Artistas
 Desde el menú principal
 ````
-Opción seleccionada: 2) Artistas más esuchcados
+Opción seleccionada: 2) Artistas más escuchados
 ````
 Se mostrarán el top 3 de artistas más escuchados, junto con la frecuencia de cada uno.
 
